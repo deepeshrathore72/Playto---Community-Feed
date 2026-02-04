@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: community-feed-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=your-secret-key-change-in-production
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/community_feed
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:80,http://127.0.0.1
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - static_volume:/app/staticfiles
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py seed_data --users 10 --posts 20 &&
+             gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
+
+  frontend:
+    build: ./frontend
+    container_name: community-feed-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:15-alpine
+    container_name: community-feed-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=community_feed
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  static_volume:
