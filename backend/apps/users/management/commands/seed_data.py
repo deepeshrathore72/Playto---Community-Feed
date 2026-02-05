@@ -34,6 +34,18 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # Check if database already has data
+        if not options['clear']:
+            existing_posts = Post.objects.count()
+            if existing_posts > 0:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f'Database already has {existing_posts} posts. Skipping seed. '
+                        'Use --clear to reset and reseed.'
+                    )
+                )
+                return
+        
         if options['clear']:
             self.stdout.write('Clearing existing data...')
             KarmaTransaction.objects.all().delete()
