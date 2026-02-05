@@ -6,6 +6,9 @@ export default function Header() {
   const { user, users, login, logout, isAuthenticated } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // Ensure users is always an array
+  const usersList = Array.isArray(users) ? users : [];
+
   const handleUserSelect = async (username) => {
     await login(username);
     setShowDropdown(false);
@@ -56,15 +59,21 @@ export default function Header() {
                     <p className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
                       Select a user:
                     </p>
-                    {users.map((u) => (
-                      <button
-                        key={u.id}
-                        onClick={() => handleUserSelect(u.username)}
-                        className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
-                      >
-                        {u.username}
-                      </button>
-                    ))}
+                    {usersList.length === 0 ? (
+                      <p className="px-4 py-2 text-xs text-gray-400 text-center">
+                        No users available
+                      </p>
+                    ) : (
+                      usersList.map((u) => (
+                        <button
+                          key={u.id}
+                          onClick={() => handleUserSelect(u.username)}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-700"
+                        >
+                          {u.username}
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>

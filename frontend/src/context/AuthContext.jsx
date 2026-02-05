@@ -17,7 +17,13 @@ export function AuthProvider({ children }) {
       if (currentUserRes.data && currentUserRes.data.id) {
         setUser(currentUserRes.data);
       }
-      setUsers(usersRes.data.results || usersRes.data || []);
+      // Ensure users is always an array
+      const userData = usersRes.data.results || usersRes.data || [];
+      setUsers(Array.isArray(userData) ? userData : []);
+      setLoading(false);
+    }).catch((error) => {
+      console.error('Failed to load initial data:', error);
+      setUsers([]);
       setLoading(false);
     });
   }, []);
