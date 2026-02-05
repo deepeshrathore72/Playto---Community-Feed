@@ -19,16 +19,18 @@ export default function Feed() {
     try {
       const response = await postsApi.list(pageNum);
       const newPosts = response.data.results || response.data;
+      const postsArray = Array.isArray(newPosts) ? newPosts : [];
       
       if (append) {
-        setPosts((prev) => [...prev, ...newPosts]);
+        setPosts((prev) => [...prev, ...postsArray]);
       } else {
-        setPosts(newPosts);
+        setPosts(postsArray);
       }
       
       setHasMore(!!response.data.next);
     } catch (error) {
       console.error('Failed to fetch posts:', error);
+      setPosts([]);
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -34,7 +34,8 @@ export default function CommentThread({ comment, postId, onReplyCreated, depth =
   };
 
   const timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true });
-  const hasReplies = comment.replies && comment.replies.length > 0;
+  const replies = Array.isArray(comment.replies) ? comment.replies : [];
+  const hasReplies = replies.length > 0;
   
   // Limit nesting depth for display (10 levels max)
   const maxDepth = 10;
@@ -88,8 +89,8 @@ export default function CommentThread({ comment, postId, onReplyCreated, depth =
             >
               {showReplies ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               <span>
-                {showReplies ? 'Hide' : 'Show'} {comment.replies.length}{' '}
-                {comment.replies.length === 1 ? 'reply' : 'replies'}
+                {showReplies ? 'Hide' : 'Show'} {replies.length}{' '}
+                {replies.length === 1 ? 'reply' : 'replies'}
               </span>
             </button>
           )}
@@ -113,7 +114,7 @@ export default function CommentThread({ comment, postId, onReplyCreated, depth =
       {/* Nested replies */}
       {showReplies && hasReplies && (
         <div className="mt-2 space-y-2">
-          {comment.replies.map((reply) => (
+          {replies.map((reply) => (
             <CommentThread
               key={reply.id}
               comment={reply}

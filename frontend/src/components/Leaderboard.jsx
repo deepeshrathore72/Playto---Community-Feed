@@ -16,9 +16,10 @@ export default function Leaderboard() {
   const fetchLeaderboard = async () => {
     try {
       const response = await leaderboardApi.get(5, 24);
-      setLeaderboard(response.data.leaderboard);
+      setLeaderboard(Array.isArray(response.data.leaderboard) ? response.data.leaderboard : []);
     } catch (error) {
       console.error('Failed to fetch leaderboard:', error);
+      setLeaderboard([]);
     } finally {
       setLoading(false);
     }

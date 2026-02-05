@@ -42,9 +42,10 @@ export default function PostCard({ post, onUpdate }) {
 
     try {
       const response = await commentsApi.getByPost(post.id);
-      setComments(response.data.comments);
+      setComments(Array.isArray(response.data.comments) ? response.data.comments : []);
     } catch (error) {
       console.error('Failed to load comments:', error);
+      setComments([]);
     } finally {
       setCommentsLoading(false);
     }
@@ -56,7 +57,9 @@ export default function PostCard({ post, onUpdate }) {
       // It's a reply - need to update the tree
       // For simplicity, refresh the comments
       commentsApi.getByPost(post.id).then((response) => {
-        setComments(response.data.comments);
+        setComments(Array.isArray(response.data.comments) ? response.data.comments : []);
+      }).catch(() => {
+        setComments([]);
       });
     } else {
       // It's a top-level comment
